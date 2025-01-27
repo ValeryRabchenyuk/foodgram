@@ -4,9 +4,9 @@ cffi==1.17.1
 charset-normalizer==3.4.1
 cryptography==44.0.0
 defusedxml==0.8.0rc2
-Django==3.2.16
-djangorestframework==3.15.2
-djangorestframework_simplejwt==5.4.0
+Django==3.2.3
+djangorestframework==3.12.4
+djangorestframework-simplejwt==5.3.1
 djoser==2.3.1
 idna==3.10
 oauthlib==3.2.2
