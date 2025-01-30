@@ -1,13 +1,17 @@
 from django.contrib import admin
 
-from .models import User
+from .models import User, Subscription
 
 
 @admin.register(User)
 class UsersAdmin(admin.ModelAdmin):
 
-    list_display = ('id', 'username', 'email','first_name', 'last_name',)
+    list_display = ('id', 'username', 'email', 'first_name', 'last_name',)
     search_fields = ('username', 'email')
+
+
+admin.site.register(Subscription)
+
 
     # list_editable = ('is_staff',)
     # list_filter = ('username',)
