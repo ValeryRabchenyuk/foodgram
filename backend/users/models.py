@@ -37,8 +37,7 @@ class User(AbstractUser):
         max_length=USERNAME_MAX_LENGTH,
         blank=False,
         null=False,
-        verbose_name='Пароль'
-    )
+        verbose_name='Пароль')
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -47,3 +46,24 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class Subscription(models.Model):
+
+    subscriber = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name='Подписчик')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscribers',
+        verbose_name='Автор')
+
+    class Meta:
+        unique_together = ('subscriber', 'author')
+        verbose_name = 'Подписки'
+    
+    def __str__(self):
+        return f'Вы подписались на {self.author}'
