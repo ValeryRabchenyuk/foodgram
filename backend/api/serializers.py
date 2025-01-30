@@ -7,7 +7,7 @@ from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer #UserSerializer
 
 from .constants import EMAIL_MAX_LENGTH, USERNAME_MAX_LENGTH
-from .models import User, Subscription
+from ..users.models import User, Subscription
 
 
 class SignUpSerializer(UserCreateSerializer):
