@@ -4,8 +4,6 @@ from django.db import models
 
 from .constants import EMAIL_MAX_LENGTH, USERNAME_MAX_LENGTH
 
-# from .api.constants import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH
-
 
 class User(AbstractUser):
 
@@ -56,6 +54,7 @@ class Subscription(models.Model):
         on_delete=models.CASCADE,
         related_name='subscriptions',
         verbose_name='Подписчик')
+
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

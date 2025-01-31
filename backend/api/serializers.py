@@ -6,11 +6,11 @@ from django.contrib.auth.tokens import default_token_generator
 
 from rest_framework import serializers
 
-from djoser.serializers import UserCreateSerializer #UserSerializer
+from djoser.serializers import UserCreateSerializer  #UserSerializer
 
 # from .constants import EMAIL_MAX_LENGTH, USERNAME_MAX_LENGTH
 from ..users.models import User, Subscription
-from ..recipes.models import Tag
+from ..recipes.models import Tag, Ingredient
 
 
 class Base64ImageField(serializers.ImageField):
@@ -27,7 +27,7 @@ class Base64ImageField(serializers.ImageField):
 
 class SignUpSerializer(UserCreateSerializer):
     """Создание пользователя."""
-# нужна проверка на символы
+
     class Mets:
         model = User
         fields = (
@@ -38,6 +38,12 @@ class SignUpSerializer(UserCreateSerializer):
             'last_name',
             'password'
         )
+
+    def validate_username(self, data):
+        pattern = re.compile(r'^[\w.@+-]+\Z')
+        if not pattern.match(data):
+            raise serializers.ValidationError('Недопустимый символ')
+        return data
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -69,3 +75,11 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ('id', 'name', 'slug')
+
+
+class IngredientSerialiser(serializers.ModelSerializer):
+    """Сериализатор для ингредиентов рецепта."""
+
+    class Meta:
+        model = Ingredient
+        fields = ('id', 'name', 'measurement_unit')
