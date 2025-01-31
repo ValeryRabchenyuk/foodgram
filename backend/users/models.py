@@ -2,8 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 
-USERNAME_MAX_LENGTH = 150
-EMAIL_MAX_LENGTH = 254
+from .constants import EMAIL_MAX_LENGTH, USERNAME_MAX_LENGTH
+
+# from .api.constants import USERNAME_MAX_LENGTH, EMAIL_MAX_LENGTH
 
 
 class User(AbstractUser):
@@ -64,6 +65,6 @@ class Subscription(models.Model):
     class Meta:
         unique_together = ('subscriber', 'author')
         verbose_name = 'Подписки'
-    
+
     def __str__(self):
         return f'Вы подписались на {self.author}'
