@@ -127,6 +127,7 @@ class Favorite(FavoriteAndShoppingListModel):
     class Meta:
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
+        default_related_name = 'favorite'
         constraints = [
             UniqueConstraint(
                 fields=['user', 'recipe'], name='favorite_unique')]
@@ -141,9 +142,10 @@ class ShoppingList(FavoriteAndShoppingListModel):
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = verbose_name
+        default_related_name = 'shopping_list'
         constraints = [
             UniqueConstraint(
-                fields=['user', 'recipe'], name='unique_shoppingcart')]
+                fields=['user', 'recipe'], name='shoppinglist_unique')]
 
     def __str__(self):
         return f'Продукты для {self.recipe.name} добавлены в список покупок.'
