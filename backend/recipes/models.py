@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator, MinValueValidator
+from django.db.models import UniqueConstraint
 
 from .constants import (TAG_MAX_LENGTH,
                         INGREDIENT_MAX_LENGTH,
@@ -7,6 +8,9 @@ from .constants import (TAG_MAX_LENGTH,
                         RECIPE_NAME_MAX_LENGTH,
                         COOKING_MIN_TIME,
                         INGREDIENT_MIN_AMOUNT)
+
+
+from users.models import User
 
 
 class Tag(models.Model):
@@ -95,4 +99,51 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = 'Количество ингредиентов'
 
     def __str__(self):
-        return f'{self.ingredient} - {self.amount}'
+        return f'{self.ingredient} — {self.amount}'
+
+
+class FavoriteAndShoppingListModel(models.Model):
+    """Абстрактная модель для избранных рецептов и списка покупок."""
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь')
+
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='Рецепт')
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f'{self.user} — {self.recipe}'
+
+
+class Favorite(FavoriteAndShoppingListModel):
+    """Избранные рецепты."""
+
+    class Meta:
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
+        constraints = [
+            UniqueConstraint(
+                fields=['user', 'recipe'], name='favorite_unique')]
+
+    def __str__(self):
+        return f'{self.recipe.name} теперь в избранном.'
+
+
+class ShoppingList(FavoriteAndShoppingListModel):
+    """Список покупок."""
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        verbose_name_plural = verbose_name
+        constraints = [
+            UniqueConstraint(
+                fields=['user', 'recipe'], name='unique_shoppingcart')]
+
+    def __str__(self):
+        return f'Продукты для {self.recipe.name} добавлены в список покупок.'
