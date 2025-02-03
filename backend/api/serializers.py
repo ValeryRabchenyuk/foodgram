@@ -84,6 +84,6 @@ class IngredientSerialiser(serializers.ModelSerializer):
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit')
 
-class RecipeSerializer
-class RecipeIngredient
+class RecipeSerializer  должно быть поле автор
+class RecipeIngredient  
 class
