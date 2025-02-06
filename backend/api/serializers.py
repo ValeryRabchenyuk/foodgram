@@ -1,23 +1,23 @@
-import re
 import base64
-# from rest_framework.serializers import ModelSerializer, SerializerMethodField
+import re
+
 from django.core.files.base import ContentFile
-from django.contrib.auth.tokens import default_token_generator
 
 from rest_framework import serializers, status
+from rest_framework.validators import UniqueTogetherValidator
 
 from djoser.serializers import UserCreateSerializer
 
-
-from ..users.models import User, Subscription
-from ..recipes.models import (Tag,
-                              Ingredient,
-                              Recipe,
-                              RecipeIngredient,
-                              ShoppingList,
-                              Favorite)
-
 from ..recipes.constants import COOKING_MIN_TIME
+from ..recipes.models import (
+    Favorite,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    ShoppingList,
+    Tag,
+)
+from ..users.models import Subscription, User
 
 
 class Base64ImageField(serializers.ImageField):
@@ -34,6 +34,8 @@ class Base64ImageField(serializers.ImageField):
 
 class SignUpSerializer(UserCreateSerializer):
     """Создание пользователя."""
+
+    password = serializers.CharField(write_only=True, required=True)
 
     class Mets:
         model = User
@@ -54,7 +56,11 @@ class SignUpSerializer(UserCreateSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Существующий пользователь."""
-    is_subscribed = serializers.SerializerMethodField()
+
+    is_subscribed = serializers.SerializerMethodField(
+        method_name='get_is_subscribed')
+
+    avatar = Base64ImageField()
 
     class Meta:
         model = User
@@ -64,6 +70,7 @@ class UserSerializer(serializers.ModelSerializer):
             'email',
             'first_name',
             'last_name',
+            'avatar',
             'is_subscribed')
 
     def get_is_subscribed(self, obj):
@@ -73,6 +80,15 @@ class UserSerializer(serializers.ModelSerializer):
                 subscriber=request.user,
                 author=obj).exists()
         return False
+
+
+class AvatarSerializer(serializers.ModelSerializer):
+
+    avatar = Base64ImageField()
+
+    class Meta:
+        model = User
+        fields = ('avatar',)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -89,8 +105,8 @@ class IngredientSerialiser(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit')
 
 
-class RecipeIngredientSerializer(serializers.ModelSerializer):
-    """Сериалайзер короткого представления ингредиента для рецепта"""
+class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
+    """Создание связи рецепт-ингредиент."""
 
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(), source='ingredient')
@@ -100,13 +116,46 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'amount')
 
 
+class RecipeIngredientSerializer(serializers.ModelSerializer):
+    """Получение ингредиентов для рецепта."""
+
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all(), source='ingredient')
+
+    measurement_unit = serializers.CharField(
+        source='ingredient.measurement_unit')
+
+    name = serializers.CharField(source='ingredient.name')
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ['id', 'amount', 'measurement_unit', 'name']
+
+
+# class RecipeTagSerializer(serializers.ModelSerializer):                                     # МОДЕЛЬ RecipeTag у меня ее нет
+#     """Получение тегов рецепта."""
+
+#     id = serializers.PrimaryKeyRelatedField(
+#         queryset=Tag.objects.all(), source='tag')
+
+#     name = serializers.CharField(source='tag.name')
+#     slug = serializers.CharField(source='tag.slug')
+
+#     class Meta:
+#         model = Tag
+#         fields = ['id', 'amount', 'measurement_unit', 'name']
+
+
 class RecipeReadSerializer(serializers.ModelSerializer):
     """Чтение рецепта."""
 
     image = Base64ImageField()
-    tags = TagSerializer(many=True)
+    tags = TagSerializer(many=True)                                     # Сюда серик с моделью RecipeTag у меня ее нет
     author = UserSerializer(read_only=True)
-    ingredients = RecipeIngredientSerializer(many=True, source='recipe')
+    ingredients = RecipeIngredientSerializer(
+        read_only=True,
+        many=True,
+        source='recipe_ingredients')
     is_favorited = serializers.BooleanField(read_only=True)                                     # ПРОВЕРИТЬ
     is_in_shopping_cart = serializers.BooleanField(read_only=True)                              # ПРОВЕРИТЬ
 
@@ -228,7 +277,7 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'cooking_time')
-        read_only_fields = ("__all__",)
+        read_only_fields = ('__all__',)
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -267,3 +316,48 @@ class ShoppingListSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Рецепт уже добавлен в Список покупок!')
         return data
+
+
+# class ReadSubscriptionSerializer(serializers.ModelSerializer):
+#     """Получение информации о подписк."""
+
+#     recipes = 
+#     recipies_count = 
+#     is_subscribed = 
+
+#     class Meta:
+#         model = User
+#         fields = '__all__'                      # Поля Рецепт и счет рецепта из юзера которых у меня нет
+
+
+#     def validate(self, attrs):
+   
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    """Создание подписки."""
+
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+        validators = [UniqueTogetherValidator(
+            queryset=Subscription.objects.all(),
+            fields=('subscriber', 'author'))]
+
+    def validate(self, attrs):
+        subscriber = attrs['subscriber']
+        author = attrs['author']
+
+        if subscriber == author:
+            raise serializers.ValidationError('Нельзя подписаться на себя.')
+
+        is_subscription_exists = Subscription.objects.filter(
+            subscriber=subscriber, author=author).exists()
+
+        if is_subscription_exists:
+            raise serializers.ValidationError('Вы уже подписаны.')
+        return attrs
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        return SubscriptionSerializer(
+            instance.author, context={'request': request}).data
