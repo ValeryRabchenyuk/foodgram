@@ -116,3 +116,17 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 6,
 
 }
+
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'SERIALIZERS': {
+        'user': 'api.serializers.SignUpSerializer',
+        'user_create': 'api.serializers.SignUpSerializer',
+        'current_user': 'api.serializers.SignUpSerializer'
+    },
+    'PERMISSIONS': {
+        'user_list': ['rest_framework.permissions.AllowAny'],
+        'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
+    },
+}
