@@ -272,7 +272,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
 
 class ShortRecipeSerializer(serializers.ModelSerializer):
-    """Короткое отображение рецепта."""
+    """Краткая информация о рецепте."""
 
     class Meta:
         model = Recipe

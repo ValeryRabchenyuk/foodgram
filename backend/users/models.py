@@ -38,6 +38,12 @@ class User(AbstractUser):
         null=False,
         verbose_name='Пароль')
 
+    avatar = models.ImageField(
+        verbose_name='Аватарка',
+        upload_to='users/avatars/',
+        null=True,
+        default=None)
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
@@ -52,18 +58,19 @@ class Subscription(models.Model):
     subscriber = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='subscriptions',
+        related_name='subscriber',
         verbose_name='Подписчик')
 
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='subscribers',
+        related_name='following',
         verbose_name='Автор')
 
     class Meta:
-        unique_together = ('subscriber', 'author')
+        unique_together = ('subscriber', 'author')      # UniqueConstraint у нормальных людей
         verbose_name = 'Подписки'
+        default_related_name = 'subscription'
 
     def __str__(self):
         return f'Вы подписались на {self.author}'

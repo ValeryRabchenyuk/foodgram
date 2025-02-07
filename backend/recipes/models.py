@@ -1,18 +1,18 @@
-
+from django.contrib.auth import get_user_model
 from django.core.validators import RegexValidator, MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
 
-from users.models import User
+from .constants import (COOKING_MIN_TIME,
+                        INGREDIENT_MAX_LENGTH,
+                        INGREDIENT_MIN_AMOUNT,
+                        MEASUREMENT_MAX_LENGTH,
+                        RECIPE_NAME_MAX_LENGTH,
+                        TAG_MAX_LENGTH,
+                        SHORT_LINK_MAX_LENGTH)
 
-from .constants import (
-    COOKING_MIN_TIME,
-    INGREDIENT_MAX_LENGTH,
-    INGREDIENT_MIN_AMOUNT,
-    MEASUREMENT_MAX_LENGTH,
-    RECIPE_NAME_MAX_LENGTH,
-    TAG_MAX_LENGTH
-)
+
+User = get_user_model()
 
 
 class Tag(models.Model):
@@ -20,7 +20,7 @@ class Tag(models.Model):
     name = models.CharField(
         max_length=TAG_MAX_LENGTH,
         unique=True,
-        verbose_name='Название')
+        verbose_name='Тег')
 
     slug = models.SlugField(
         max_length=TAG_MAX_LENGTH,
@@ -31,6 +31,7 @@ class Tag(models.Model):
                 message='Поле содержите недопустимый символ')])
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
         default_related_name = 'tag'
@@ -43,15 +44,17 @@ class Ingredient(models.Model):
 
     name = models.CharField(
         max_length=INGREDIENT_MAX_LENGTH,
-        verbose_name='Название')
+        verbose_name='Ингредиент')
 
     measurement_unit = models.CharField(
         max_length=MEASUREMENT_MAX_LENGTH,
         verbose_name='Единица измерения')
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        # default_related_name = 'tags'             У МИШИ
 
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
@@ -62,7 +65,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        default=1,
+        # default=1,
         verbose_name='Автор')
 
     ingredients = models.ManyToManyField(
@@ -70,10 +73,10 @@ class Recipe(models.Model):
         through='RecipeIngredient',
         verbose_name='Ингредиенты')
 
-    tags = models.ManyToManyField(Tag, verbose_name='Теги')
+    tags = models.ManyToManyField(Tag, verbose_name='Теги')         #   У МИШЫ         related_name='recipes'
 
     image = models.ImageField(
-        upload_to='recipes/images/',
+        upload_to='images',
         verbose_name='Картинка')
 
     name = models.CharField(
@@ -86,7 +89,15 @@ class Recipe(models.Model):
         verbose_name='Время приготовления',
         validators=[MinValueValidator(COOKING_MIN_TIME)])
 
+    short_link = models.CharField(
+        verbose_name='Короткая ссылка',
+        max_length=SHORT_LINK_MAX_LENGTH,
+        unique=True,
+        blank=True,
+        null=True)
+
     class Meta:
+        default_related_name = 'recipes'
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         ordering = ('-id',)
@@ -101,7 +112,7 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipe')
+        related_name='recipe')         #   У МИШЫ    НЕТ ЭТОЙ СТРОКИ
 
     ingredient = models.ForeignKey(
         Ingredient,
@@ -115,7 +126,7 @@ class RecipeIngredient(models.Model):
     class Meta:
         default_related_name = 'recipe_ingredients'
         verbose_name = 'Количество ингредиент'
-        verbose_name_plural = 'Количество ингредиентов'
+        verbose_name_plural = 'Количество ингредиентов'     #   У МИШЫ    здесь UniqueConstraint fields=['ingredient', 'recipe'],
 
     def __str__(self):
         return f'{self.ingredient} — {self.amount}'
@@ -153,7 +164,7 @@ class Favorite(FavoriteAndShoppingListModel):
                 fields=['user', 'recipe'], name='favorite_unique')]
 
     def __str__(self):
-        return f'{self.recipe.name} теперь в избранном.'
+        return f'{self.recipe} теперь в избранном.'
 
 
 class ShoppingList(FavoriteAndShoppingListModel):
@@ -168,4 +179,4 @@ class ShoppingList(FavoriteAndShoppingListModel):
                 fields=['user', 'recipe'], name='shoppinglist_unique')]
 
     def __str__(self):
-        return f'Продукты для {self.recipe.name} добавлены в список покупок.'
+        return f'Продукты для {self.recipe} добавлены в список покупок.'        #   БЫЛО {self.recipe.name} 
