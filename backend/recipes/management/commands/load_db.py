@@ -8,7 +8,7 @@ from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
-    """Заполнение базы ингридиентами"""
+    """Заполнение базы ингридиентами."""
 
     def handle(self, *args, **options):
 
