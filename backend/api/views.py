@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-
+from rest_framework.reverse import reverse
 
 from ..recipes.models import (Favorite,
                               Ingredient,
@@ -236,7 +236,21 @@ class RecipesViewSet(viewsets.ModelViewSet):
         recipe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def get_short_link(self, request, pk):
+        """Возвращает короткую ссылку на рецепт."""
+        recipe = get_object_or_404(Recipe, pk=pk)
+        rev_link = reverse('short_url', args=[recipe.pk])
+        return Response(
+            {'short-link': request.build_absolute_uri(rev_link)},
+            status=status.HTTP_200_OK)
 
-def short_url(request, short_link_code):
-    recipe = get_object_or_404(Recipe, short_link=short_link_code)
+
+def short_url(request, short_link):
+
+    link = request.build_absolute_uri()
+    recipe = get_object_or_404(Recipe, short_link=link)
     return redirect('api:recipe-detail', pk=recipe.id)
+
+# def short_url(request, short_link_code):
+#     recipe = get_object_or_404(Recipe, short_link=short_link_code)
+#     return redirect('api:recipe-detail', pk=recipe.id)
