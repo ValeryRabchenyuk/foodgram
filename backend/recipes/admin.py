@@ -11,9 +11,10 @@ from .models import (Tag,
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
 
-    list_display = ('name', 'measurement_unit')
+    list_display = ('id', 'name', 'measurement_unit')
+    list_editable = ('name', 'measurement_unit')
     search_fields = ('name',)
-
+    list_filter = ('name',)
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
