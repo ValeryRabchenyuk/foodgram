@@ -12,13 +12,13 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
-from ..recipes.models import (Favorite,
-                              Ingredient,
-                              Recipe,
-                              RecipeIngredient,
-                              ShoppingList,
-                              Tag)
-from ..users.models import Subscription
+from recipes.models import (Favorite,
+                            Ingredient,
+                            Recipe,
+                            RecipeIngredient,
+                            ShoppingList,
+                            Tag)
+from users.models import Subscription
 
 from api.serializers import (SignUpSerializer,
                              UserSerializer,

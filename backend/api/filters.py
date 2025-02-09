@@ -1,4 +1,4 @@
-from django_filters
+import django_filters
 from django_filters.rest_framework import CharFilter, FilterSet
 
 from recipes.models import Recipe, Ingredient
@@ -18,10 +18,10 @@ class RecipeFilter(FilterSet):
 
     tags = django_filters.AllValuesMultipleFilter(
         field_name='tags__slug', lookup_expr='icontains')
-    
+
     is_in_shopping_list = django_filters.NumberFilter(
         method='get_is_in_shopping_list')
-    
+
     is_favorited = django_filters.NumberFilter(method='get_is_in_favorite')
 
     class Meta:

@@ -7,15 +7,15 @@ from rest_framework import serializers
 
 from djoser.serializers import UserCreateSerializer
 
-from ..recipes.constants import COOKING_MIN_TIME
-from ..recipes.models import (Favorite,
-                              Ingredient,
-                              Recipe,
-                              RecipeIngredient,
-                              ShoppingList,
-                              Tag)
+from recipes.constants import COOKING_MIN_TIME
+from recipes.models import (Favorite,
+                            Ingredient,
+                            Recipe,
+                            RecipeIngredient,
+                            ShoppingList,
+                            Tag)
 
-from ..users.models import Subscription, User
+from users.models import Subscription, User
 
 
 class Base64ImageField(serializers.ImageField):
