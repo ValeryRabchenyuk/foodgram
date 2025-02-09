@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-x$@v-aa(ijd)==3dljke+2!3$v4oe_i$q$pk&mv*vrkhdjaph8
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['89.169.162.121', '127.0.0.1', 'localhost', 'yafoodgram.hopto.org']
 
 
 INSTALLED_APPS = [
@@ -107,6 +107,7 @@ DJOSER = {
         'user_create': 'api.serializers.SignUpSerializer',
         'current_user': 'api.serializers.SignUpSerializer'
     },
+    'HIDE_USERS': False,
     'PERMISSIONS': {
         'user_list': ['rest_framework.permissions.AllowAny'],
         'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
