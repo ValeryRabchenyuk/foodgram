@@ -16,6 +16,7 @@ from recipes.models import (Favorite,
                             Tag)
 
 from users.models import Subscription, User
+from users.constants import USERNAME_MAX_LENGTH
 
 
 class Base64ImageField(serializers.ImageField):
@@ -34,6 +35,14 @@ class SignUpSerializer(UserCreateSerializer):
     """Создание пользователя."""
 
     password = serializers.CharField(write_only=True, required=True)
+
+    first_name = serializers.CharField(
+        required=True,
+        max_length=USERNAME_MAX_LENGTH)
+
+    last_name = serializers.CharField(
+        required=True,
+        max_length=USERNAME_MAX_LENGTH)
 
     class Mets:
         model = User
@@ -140,8 +149,8 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         read_only=True,
         many=True,
         source='recipe_ingredients')
-    is_favorited = serializers.BooleanField(read_only=True)                                     # ПРОВЕРИТЬ
-    is_in_shopping_cart = serializers.BooleanField(read_only=True)                              # ПРОВЕРИТЬ
+    is_favorited = serializers.BooleanField(read_only=True)
+    is_in_shopping_cart = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Recipe

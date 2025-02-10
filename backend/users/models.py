@@ -7,6 +7,9 @@ from .constants import EMAIL_MAX_LENGTH, USERNAME_MAX_LENGTH
 
 class User(AbstractUser):
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username', 'first_name', 'last_name', 'password')
+
     username = models.CharField(
         max_length=USERNAME_MAX_LENGTH,
         unique=True,
