@@ -54,7 +54,6 @@ class Ingredient(models.Model):
         ordering = ('name',)
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
-        # default_related_name = 'tags'             У МИШИ
 
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
@@ -73,7 +72,7 @@ class Recipe(models.Model):
         through='RecipeIngredient',
         verbose_name='Ингредиенты')
 
-    tags = models.ManyToManyField(Tag, verbose_name='Теги')         #   У МИШЫ         related_name='recipes'
+    tags = models.ManyToManyField(Tag, verbose_name='Теги')
 
     image = models.ImageField(
         upload_to='images',
@@ -112,7 +111,7 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipe')         #   У МИШЫ    НЕТ ЭТОЙ СТРОКИ
+        related_name='recipe')
 
     ingredient = models.ForeignKey(
         Ingredient,
@@ -126,7 +125,7 @@ class RecipeIngredient(models.Model):
     class Meta:
         default_related_name = 'recipe_ingredients'
         verbose_name = 'Количество ингредиент'
-        verbose_name_plural = 'Количество ингредиентов'     #   У МИШЫ    здесь UniqueConstraint fields=['ingredient', 'recipe'],
+        verbose_name_plural = 'Количество ингредиентов'
 
     def __str__(self):
         return f'{self.ingredient} — {self.amount}'
@@ -179,4 +178,4 @@ class ShoppingList(FavoriteAndShoppingListModel):
                 fields=['user', 'recipe'], name='shoppinglist_unique')]
 
     def __str__(self):
-        return f'Продукты для {self.recipe} добавлены в список покупок.'        #   БЫЛО {self.recipe.name} 
+        return f'Продукты для {self.recipe} добавлены в список покупок.'

@@ -71,7 +71,7 @@ class Subscription(models.Model):
         verbose_name='Автор')
 
     class Meta:
-        unique_together = ('subscriber', 'author')      # UniqueConstraint у нормальных людей
+        unique_together = ('subscriber', 'author')
         verbose_name = 'Подписки'
         default_related_name = 'subscription'
 

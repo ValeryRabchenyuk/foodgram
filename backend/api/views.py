@@ -250,7 +250,3 @@ def short_url(request, short_link):
     link = request.build_absolute_uri()
     recipe = get_object_or_404(Recipe, short_link=link)
     return redirect('api:recipe-detail', pk=recipe.id)
-
-# def short_url(request, short_link_code):
-#     recipe = get_object_or_404(Recipe, short_link=short_link_code)
-#     return redirect('api:recipe-detail', pk=recipe.id)
