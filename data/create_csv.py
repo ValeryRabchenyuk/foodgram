@@ -1,6 +1,7 @@
 import csv
 
 data = [
+    ('name', 'slug'),
     ('завтрак', 'breakfast'),
     ('обед', 'lunch'),
     ('ужин', 'dinner'),

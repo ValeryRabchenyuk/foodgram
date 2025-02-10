@@ -1,38 +1,42 @@
 [
     {
-        "завтрак": "обед",
-        "breakfast": "lunch"
+        "name": "завтрак",
+        "slug": "breakfast"
     },
     {
-        "завтрак": "ужин",
-        "breakfast": "dinner"
+        "name": "обед",
+        "slug": "lunch"
     },
     {
-        "завтрак": "коктейль",
-        "breakfast": "cocktail"
+        "name": "ужин",
+        "slug": "dinner"
     },
     {
-        "завтрак": "антре",
-        "breakfast": "appetizers"
+        "name": "коктейль",
+        "slug": "cocktail"
     },
     {
-        "завтрак": "выпечка",
-        "breakfast": "baking"
+        "name": "антре",
+        "slug": "appetizers"
     },
     {
-        "завтрак": "пища богов",
-        "breakfast": "the Food of the Gods"
+        "name": "выпечка",
+        "slug": "baking"
     },
     {
-        "завтрак": "чайнатаун",
-        "breakfast": "chinesefood"
+        "name": "пища богов",
+        "slug": "the Food of the Gods"
     },
     {
-        "завтрак": "каннам",
-        "breakfast": "koreanfood"
+        "name": "чайнатаун",
+        "slug": "chinesefood"
     },
     {
-        "завтрак": "как у бабули",
-        "breakfast": "comfort food"
+        "name": "каннам",
+        "slug": "koreanfood"
+    },
+    {
+        "name": "как у бабули",
+        "slug": "comfort food"
     }
 ]

@@ -137,5 +137,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
 PATH_TO_INGREDIENTS = BASE_DIR / 'data/ingredients.json'
+PATH_TO_TAGS = BASE_DIR / 'data/tags.json'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

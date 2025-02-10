@@ -12,12 +12,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        with open(PATH_TO_INGREDIENTS, encoding='UTF-8') as ingrrdietnds_file:
-            ingredients = json.load(ingrrdietnds_file)
+        with open(PATH_TO_INGREDIENTS, encoding='UTF-8') as ingredients_file:
+            ingredients = json.load(ingredients_file)
 
-            for ingridient in tqdm(ingredients):
+            for ingredients in tqdm(ingredients):
                 try:
-                    Ingredient.objects.get_or_create(**ingridient)
+                    Ingredient.objects.get_or_create(**ingredients)
                 except CommandError as e:
                     raise CommandError(
-                        f'Ошибка {e} при добавлении {ingridient}.')
+                        f'Ошибка {e} при добавлении {ingredients}.')
