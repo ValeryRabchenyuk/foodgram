@@ -16,6 +16,7 @@ class IngredientAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('name',)
 
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
 
