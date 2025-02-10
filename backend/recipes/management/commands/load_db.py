@@ -20,5 +20,4 @@ class Command(BaseCommand):
                     Ingredient.objects.get_or_create(**ingridient)
                 except CommandError as e:
                     raise CommandError(
-                        f'При добавлении {ingridient} '
-                        f'произшла ошибка {e}')
+                        f'Ошибка {e} при добавлении {ingridient}.')

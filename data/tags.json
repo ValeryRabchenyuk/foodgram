@@ -1,0 +1,38 @@
+[
+    {
+        "завтрак": "обед",
+        "breakfast": "lunch"
+    },
+    {
+        "завтрак": "ужин",
+        "breakfast": "dinner"
+    },
+    {
+        "завтрак": "коктейль",
+        "breakfast": "cocktail"
+    },
+    {
+        "завтрак": "антре",
+        "breakfast": "appetizers"
+    },
+    {
+        "завтрак": "выпечка",
+        "breakfast": "baking"
+    },
+    {
+        "завтрак": "пища богов",
+        "breakfast": "the Food of the Gods"
+    },
+    {
+        "завтрак": "чайнатаун",
+        "breakfast": "chinesefood"
+    },
+    {
+        "завтрак": "каннам",
+        "breakfast": "koreanfood"
+    },
+    {
+        "завтрак": "как у бабули",
+        "breakfast": "comfort food"
+    }
+]
