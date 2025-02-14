@@ -64,7 +64,6 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        # default=1,
         verbose_name='Автор')
 
     ingredients = models.ManyToManyField(
@@ -118,7 +117,7 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Ингредиент')
 
-    amount = models.PositiveIntegerField(
+    amount = models.PositiveSmallIntegerField(
         verbose_name='Количество ингредиента',
         validators=[MinValueValidator(INGREDIENT_MIN_AMOUNT)])
 
