@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.http import HttpResponse
@@ -34,6 +36,7 @@ from api.serializers import (SignUpSerializer,
 from api.filters import IngredientFilter, RecipeFilter
 from api.pagination import CustomPagination
 from api.permissions import IsAuthorOrReadOnly
+from api.utils import prepare_recipes_to_download
 
 User = get_user_model()
 
@@ -88,7 +91,7 @@ class UserViewSet(DjoserUserViewSet):
     def get_subscribtions(self, request):
         user = get_object_or_404(User, username=request.user.username)
         limit = request.query_params.get('limit')
-        following_users = User.objects.filter(following__subscriber=user)
+        following_users = User.objects.filter(subscriber__subscriber=user)
         if limit:
             following_users = following_users[:int(limit)]
         paginator = CustomPagination()
@@ -117,9 +120,7 @@ class UserViewSet(DjoserUserViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         follow = Subscription.objects.filter(
-            user=user.id,
-            following=following.id
-        )
+            subscriber=user.id, author=following.id)
         if follow:
             follow.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -186,7 +187,8 @@ class RecipesViewSet(viewsets.ModelViewSet):
         detail=False,
         permission_classes=[IsAuthenticated],
     )
-    def download_shopping_cart(self, request):
+    def make_shopping_list(self, request):
+
         shopping_cart_ingredients = (
             RecipeIngredient.objects.filter(
                 recipe__cart_recipes__user=request.user
@@ -195,25 +197,14 @@ class RecipesViewSet(viewsets.ModelViewSet):
                 'ingredient__measurement_unit'
             ).annotate(total_amount=Sum('amount')).order_by('ingredient__name')
         )
-        shopping_list = self.prepsre_recipes_to_dl(shopping_cart_ingredients)
+        shopping_list = prepare_recipes_to_download(shopping_cart_ingredients)
         return self.dl_shopping_list(shopping_list)
 
-    def prepsre_recipes_to_dl(self, ingredients):
-        shopping_list = []
-        for item in ingredients:
-            name = item['ingredient__name']
-            unit = item['ingredient__measurement_unit']
-            total_amount = item['total_amount']
-            shopping_list.append(f"{name} ({unit}) — {total_amount}")
-        shopping_list_text = "\n".join(shopping_list)
-        return shopping_list_text
-
-    def dl_shopping_list(self, shopping_list_text):
+    def download_shopping_list(self, shopping_list_text):
         response = HttpResponse(shopping_list_text, content_type='text/plain')
         response[
             'Content-Disposition'
         ] = 'attachment; filename="shopping_list.txt"'
-
         return response
 
     def add_to_favorite_or_shopping_list(
@@ -238,6 +229,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
 
     def get_short_link(self, request, pk):
         """Возвращает короткую ссылку на рецепт."""
+
         recipe = get_object_or_404(Recipe, pk=pk)
         rev_link = reverse('short_url', args=[recipe.pk])
         return Response(

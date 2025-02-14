@@ -19,16 +19,16 @@ class RecipeFilter(FilterSet):
     tags = django_filters.AllValuesMultipleFilter(
         field_name='tags__slug', lookup_expr='icontains')
 
-    is_in_shopping_list = django_filters.NumberFilter(
-        method='get_is_in_shopping_list')
+    is_in_shopping_cart = django_filters.NumberFilter(
+        method='get_is_in_shopping_cart')
 
     is_favorited = django_filters.NumberFilter(method='get_is_in_favorite')
 
     class Meta:
         model = Recipe
-        fields = ['tags', 'author', 'is_in_shopping_list', 'is_favorited']
+        fields = ['tags', 'author', 'is_in_shopping_cart', 'is_favorited']
 
-    def get_is_in_shopping_list(self, queryset, name, value):
+    def get_is_in_shopping_cart(self, queryset, name, value):
         if self.request.user.is_authenticated and value:
             return queryset.filter(shopping_list__user=self.request.user)
         return queryset

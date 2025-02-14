@@ -74,6 +74,16 @@ class Subscription(models.Model):
         unique_together = ('subscriber', 'author')
         verbose_name = 'Подписки'
         default_related_name = 'subscription'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['subscriber', 'author'],
+                name='unique_subscriber_author'
+            ),
+            models.CheckConstraint(
+                name='check_subscriber_author',
+                check=~models.Q(subscriber=models.F('author')),
+            )
+        ]
 
     def __str__(self):
         return f'Вы подписались на {self.author}'
