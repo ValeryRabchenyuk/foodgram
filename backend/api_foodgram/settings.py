@@ -1,14 +1,16 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = 'django-insecure-x$@v-aa(ijd)==3dljke+2!3$v4oe_i$q$pk&mv*vrkhdjaph8'
-
+SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = True
-
-# ALLOWED_HOSTS = ['89.169.162.121', '127.0.0.1', 'localhost', 'yafoodgram.hopto.org']
+# DEBUG = os.getenv("DEBUG", 'False').lower() == 'true'
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost, 127.0.0.1').split(', ')
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
