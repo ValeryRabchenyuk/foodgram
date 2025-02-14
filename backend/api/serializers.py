@@ -85,7 +85,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user.is_authenticated and user.subscriber.filter(
             author=author).exists()
 
-  
+
 class AvatarSerializer(serializers.ModelSerializer):
 
     avatar = Base64ImageField()
