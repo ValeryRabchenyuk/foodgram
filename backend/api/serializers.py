@@ -370,4 +370,4 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         request = self.context.get('request')
         return ReadSubscriptionSerializer(
-            instance.author, context={'request': request}).data
+            instance.subscriber, context={'request': request}).data
