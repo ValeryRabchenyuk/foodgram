@@ -90,7 +90,7 @@ class UserViewSet(DjoserUserViewSet):
     def get_subscribtions(self, request):
         user = get_object_or_404(User, username=request.user.username)
         limit = request.query_params.get('limit')
-        following_users = User.objects.filter(subscriber__subscriber=user)
+        following_users = User.objects.filter(following__subscriber=user)
         if limit:
             following_users = following_users[:int(limit)]
         paginator = CustomPagination()
