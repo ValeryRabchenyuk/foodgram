@@ -3,8 +3,10 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 
-from djoser.views import UserViewSet as DjoserUserViewSet
 from django_filters.rest_framework import DjangoFilterBackend
+
+from djoser.views import UserViewSet as DjoserUserViewSet
+
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
@@ -20,6 +22,9 @@ from recipes.models import (Favorite,
                             Tag)
 from users.models import Subscription
 
+from api.filters import IngredientFilter, RecipeFilter
+from api.pagination import CustomPagination
+from api.permissions import IsAuthorOrReadOnly
 from api.serializers import (SignUpSerializer,
                              UserSerializer,
                              AvatarSerializer,
@@ -30,10 +35,6 @@ from api.serializers import (SignUpSerializer,
                              RecipeWriteSerializer,
                              FavoriteSerializer,
                              ShoppingListSerializer)
-
-from api.filters import IngredientFilter, RecipeFilter
-from api.pagination import CustomPagination
-from api.permissions import IsAuthorOrReadOnly
 from api.utils import prepare_recipes_to_download
 
 User = get_user_model()
@@ -186,17 +187,16 @@ class RecipesViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated],
     )
     def make_shopping_list(self, request):
-
         shopping_cart_ingredients = (
             RecipeIngredient.objects.filter(
-                recipe__cart_recipes__user=request.user
+                recipe__shopping_list__user=request.user
             ).values(
                 'ingredient__name',
                 'ingredient__measurement_unit'
             ).annotate(total_amount=Sum('amount')).order_by('ingredient__name')
         )
         shopping_list = prepare_recipes_to_download(shopping_cart_ingredients)
-        return self.dl_shopping_list(shopping_list)
+        return self.download_shopping_list(shopping_list)
 
     def download_shopping_list(self, shopping_list_text):
         response = HttpResponse(shopping_list_text, content_type='text/plain')
@@ -206,7 +206,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         return response
 
     def add_to_favorite_or_shopping_list(
-            self, serializer, model, id, request,
+            self, id, model, serializer, request,
     ):
         recipe = get_object_or_404(Recipe, id=id)
         if request.method == 'POST':
@@ -225,6 +225,11 @@ class RecipesViewSet(viewsets.ModelViewSet):
         recipe.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(
+        methods=['GET'],
+        url_path='get-link',
+        detail=True
+    )
     def get_short_link(self, request, pk):
         """Возвращает короткую ссылку на рецепт."""
 

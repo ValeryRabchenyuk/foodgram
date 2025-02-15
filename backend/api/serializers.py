@@ -14,9 +14,8 @@ from recipes.models import (Favorite,
                             RecipeIngredient,
                             ShoppingList,
                             Tag)
-
-from users.models import Subscription, User
 from users.constants import USERNAME_MAX_LENGTH
+from users.models import Subscription, User
 
 
 class Base64ImageField(serializers.ImageField):
@@ -145,7 +144,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientSerializer(
         read_only=True,
         many=True,
-        source='recipe')
+        source='recipe_ingredients')
     is_favorited = serializers.SerializerMethodField(
         method_name='get_is_in_favorite')
     is_in_shopping_cart = serializers.SerializerMethodField(
@@ -238,7 +237,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
     def tags_and_ingredients(self, recipe, tags, ingredients):
         recipe.tags.set(tags)
-        recipe.ingredients.all().delete()
         RecipeIngredient.objects.bulk_create(
             [
                 RecipeIngredient(recipe=recipe, **ingredient)
@@ -259,6 +257,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('recipe_ingredients')
+        instance.tags.set(tags)
+        instance.recipe_ingredients.all().delete()
         self.tags_and_ingredients(instance, tags, ingredients)
         return super().update(instance, validated_data)
 
@@ -287,7 +287,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         user = data['user']
-        if user.favorites.filter(recipe=data['recipe']).exists():
+        if user.favorite.filter(recipe=data['recipe']).exists():
             raise serializers.ValidationError(
                 'Рецепт уже добавлен в Избранное.')
         return data
