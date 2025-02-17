@@ -263,40 +263,45 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
         read_only_fields = ('__all__',)
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
+class BaseFavoriteShoppingSerializer(serializers.ModelSerializer):
+    """Базовый сериализатор для Избранного и Списока покупок."""
+
+    class Meta:
+        abstract = True
+
+    def validate(self, data):
+        user = data['user']
+        recipe = data['recipe']
+        model_name = self.Meta.model.__name__.lower()
+
+        if model_name == 'favorite':
+            if user.favorite.filter(recipe=recipe).exists():
+                raise serializers.ValidationError(
+                    'Рецепт уже добавлен в Избранное.')
+        if model_name == 'shoppinglist':
+            if user.shopping_list.filter(recipe=recipe).exists():
+                raise serializers.ValidationError(
+                    'Рецепт уже добавлен в Список покупок!')
+        return data
+
+    def to_representation(self, instance):
+        return ShortRecipeSerializer(instance.recipe).data
+
+
+class FavoriteSerializer(BaseFavoriteShoppingSerializer):
     """Избранные рецепты."""
 
     class Meta:
         model = Favorite
         fields = ('user', 'recipe')
 
-    def validate(self, data):
-        user = data['user']
-        if user.favorite.filter(recipe=data['recipe']).exists():
-            raise serializers.ValidationError(
-                'Рецепт уже добавлен в Избранное.')
-        return data
 
-    def to_representation(self, instance):
-        return ShortRecipeSerializer(instance.recipe).data
-
-
-class ShoppingListSerializer(serializers.ModelSerializer):
+class ShoppingListSerializer(BaseFavoriteShoppingSerializer):
     """Список покупок."""
 
     class Meta:
         model = ShoppingList
         fields = ('user', 'recipe')
-
-    def validate(self, data):
-        user = data['user']
-        if user.shopping_list.filter(recipe=data['recipe']).exists():
-            raise serializers.ValidationError(
-                'Рецепт уже добавлен в Список покупок!')
-        return data
-
-    def to_representation(self, instance):
-        return ShortRecipeSerializer(instance.recipe).data
 
 
 class ReadSubscriptionSerializer(serializers.ModelSerializer):
