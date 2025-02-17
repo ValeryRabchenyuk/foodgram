@@ -264,7 +264,7 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
 
 
 class BaseFavoriteShoppingSerializer(serializers.ModelSerializer):
-    """Базовый сериализатор для Избранного и Списока покупок."""
+    """Базовый сериализатор для избранного и списка покупок."""
 
     class Meta:
         abstract = True
