@@ -1,11 +1,9 @@
 import re
 
-from django.core.files.base import ContentFile
-
+from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
-from djoser.serializers import UserCreateSerializer
-
+from api.helpers import Base64ImageField
 from recipes.constants import COOKING_MIN_TIME
 from recipes.models import (Favorite,
                             Ingredient,
@@ -15,7 +13,6 @@ from recipes.models import (Favorite,
                             Tag)
 from users.constants import USERNAME_MAX_LENGTH
 from users.models import Subscription, User
-from api.helpers import Base64ImageField
 
 
 class SignUpSerializer(UserCreateSerializer):
