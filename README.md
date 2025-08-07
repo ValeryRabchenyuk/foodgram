@@ -98,7 +98,7 @@ docker compose up -d
 #### Запуск приложения на удалённом сервере
 
 1. **Выполните вход на удаленный сервер**
-2. **Установите Docker:и docker-compose:**
+2. **Установите Docker и docker-compose:**
 
 ```bash
    sudo apt install docker.io
